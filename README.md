@@ -1,5 +1,5 @@
 # hardwarelab
-hardware lab for aro 2023.
+hardware lab for advanced robotics at the University of Edinburgh
 
 To get started, simply clone the repository to you local DICE machine:
 

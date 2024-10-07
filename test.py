@@ -1,20 +1,64 @@
-class PIDController:
+from motor_control.AROMotorControl import AROMotorControl
+
+mc = AROMotorControl()
+mc.readPosition(motorid=1)
+
+
+from template import run_until
+
+dt = 0.005
+N = int(2. / dt)
+
+anglevalues =[]
+
     
-    def __init__(self, Kp, Ki, Kd):
+import matplotlib.pyplot as plt
+
+    
+def store_values_and_apply_torques(motorid, torque):
+    global anglevalues
+    mc.applyTorqueToMotor(motorid=motorid, torque=torque)
+    anglevalues+= [mc.readPosition(motorid)]
+
+def resandrun(torque):
+        global anglevalues
+        anglevalues =[]
+
+        try:
+            run_until(store_values_and_apply_torques, N=N, dt=0.005, motorid=1, torque=torque)
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt received, stopping motors...")
+        except Exception as e:
+            print(f"an error occurred: {e}")
+        finally:
+            mc.applyCurrentToMotor(1, 0)
+            mc.applyCurrentToMotor(2, 0)
+            print("motors stopped!")
+
+        time_values = [i * dt for i in range(len(anglevalues))]
+        # Plotting the angle values
+        plt.figure(figsize=(10, 5))
+        plt.plot(time_values, anglevalues, marker='o', linestyle='-')
+        plt.title('Motor Angle Values Over Time')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Angle Values (% 2Pi)')
+        plt.grid()
+        plt.show()
+        
+        
+def clip(output):
+    #return output
+    outabs = abs(output)
+    if outabs < 1e-4:
+        return 0
+    clipped = max(min(outabs, 0.1), 0.02)
+    return clipped if output > 0 else -clipped
+
+class PController:
+    
+    def __init__(self, Kp):
         self.Kp = Kp
-        self.Ki = Ki
-        self.Kd = Kd
-        self.prev_error = 0
-        self.cummulative_error = 0
-        self.first = True
-        
-    def reset(self):
-        self.prev_error = 0
-        self.cummulative_error = 0
-        self.first = True
-        
-        
-        
+                      
     def shortest_path_error(self, target, current):
         diff = ( target - current + 180 ) % 360 - 180;
         if diff < -180:
@@ -23,88 +67,124 @@ class PIDController:
                 return diff
         else:
                 return -diff
-
         
-    def compute(self, target, current, dt=0.01):
+    def compute(self, target, current):
         error = self.shortest_path_error(target, current)
-        self.cummulative_error += error * dt
-        d_error = (error - self.prev_error) if not self.first else 0
-        output = self.Kp*error + self.Kd * d_error / dt + self.Ki * self.cummulative_error
-        #print(f"target: {target} current: {current} torque: {output}")
-        self.prev_error = error
-        self.first = False
-        return output
+        output = self.Kp*error
+        return clip(output)
+        
+        
+def goTo(controller, target, time = 1., dt = 0.005, motorid =1):
+    anglevalues =[]
+    N = (int)(time / dt)
+    
+    def oneStep():
+        nonlocal anglevalues
+        currentAngle = mc.readPosition(motorid)
+        anglevalues+=[currentAngle]
+        tau = controller.compute(target,currentAngle)
+        mc.applyTorqueToMotor(motorid,tau)   
+        
+    run_until(oneStep, N=N, dt=dt)
+    
+    mc.applyCurrentToMotor(1, 0)
+    mc.applyCurrentToMotor(2, 0)
+    
+    time_values = [i * dt for i in range(len(anglevalues))]
+    # Plotting the angle values
+    plt.figure(figsize=(10, 5))
+    plt.plot(time_values, anglevalues, marker='o', linestyle='-')
+    plt.axhline(y=target, color='r', linestyle='--', label='Target Value')  # Add horizontal line for target
+    plt.title('Motor Angle Values Over Time')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Angle Values (% 2Pi)')
+    plt.grid()
+    plt.show()
     
     
+class PDController:
+    
+    def __init__(self, Kp, Kd):
+        self.Kp = Kp
+        self.Kd = Kd
+        self.prev_error = 0
+        self.first_call = True #do not compute error variation on first call
+        
+    
+    def reset(self):
+        self.first_call = True
+                      
+    def shortest_path_error(self, target, current):
+        diff = ( target - current + 180 ) % 360 - 180;
+        if diff < -180:
+                diff = diff + 360
+        if (current + diff) % 360 == target:
+                return diff
+        else:
+                return -diff
+        
+    def compute(self, target, current, dt):
+        error = self.shortest_path_error(target, current)        
+        d_error = (error - self.prev_error) if not self.first_call else 0
+        output = self.Kp*error + self.Kd * d_error
+        self.first_call = False
+        return clip(output)
+        
+    
+def goTo(controller, target, time = 1., dt = 0.005, motorid =1):
+    anglevalues =[]
+    N = (int)(time / dt)
+    
+    def oneStep():
+        nonlocal anglevalues
+        currentAngle = mc.readPosition(motorid)
+        anglevalues+=[currentAngle]
+        tau = controller.compute(target,currentAngle, dt)
+        mc.applyTorqueToMotor(motorid,tau)   
+        
+    run_until(oneStep, N=N, dt=dt)
+    
+    mc.applyCurrentToMotor(1, 0)
+    mc.applyCurrentToMotor(2, 0)
+    
+    
+    time_values = [i * dt for i in range(len(anglevalues))]
+    # Plotting the angle values
+    plt.figure(figsize=(10, 5))
+    plt.plot(time_values, anglevalues, marker='o', linestyle='-')
+    plt.axhline(y=target, color='r', linestyle='--', label='Target Value')  # Add horizontal line for target
+    plt.title('Motor Angle Values Over Time')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Angle Values (% 2Pi)')
+    plt.grid()
+    plt.show()
+    
+dt = 0.005
+N = int(30. / dt)
 
-pid1 = PIDController(0.00358,0.,0.00004)
-pid2 = PIDController(0.00358,0.,0.00004)
-
-target1 = 160
-target2 = 90
-
-
-import time
-t = time.perf_counter()
-wait = 1. / 1e4
-N=int(10e3) #10 seconds
-N=int(30) #1 seconds
-dt = 2. / 1e3
-for i in range(N):
-    t +=dt
-    #run your code
-    while(time.perf_counter()-t<dt):
-        pass
-        time.sleep(wait)
-
-
-import time
-
-start = time.time()
-from motor_control.AROMotorControl import AROMotorControl
-
-mc = AROMotorControl()
-#mc.setZero(1)
-#mc.setZero(2)
-
-pids = [pid1, pid2]
-
-def goto(target=target1, motorid=1):
-        a1 = mc.readPosition(motorid)
-        print("initpos", a1)
-        positions = []
-        taus = []
-        times = []
-        t = time.perf_counter()
-        pid = pids[motorid-1]
-        pid.reset()
-        try:
-                for i in range(N):
-                        a1 = mc.readPosition(motorid)
-                        tau1 = pid.compute(target,a1, dt)
-                        current = tau1/0.16
-                        _ = mc.applyTorqueToMotor(motorid,tau1)
-                        #_ = mc.applyCurrentToMotor(motorid,current)                        
-                        taus+=[tau1]
-                        positions += [(int)(a1)]
-                        #run your code
-                        while(time.perf_counter()-t<dt):
-                                pass
-                                time.sleep(wait)
-                        times+=[time.perf_counter()  - t  ]
-                        t =time.perf_counter()
-                a1 = mc.readPosition(motorid)
-                print("final", a1)
-                print("positions", positions)
-                print("taus", taus)                        
-                print("times", times)                    
-                #print("len", len(times))
-                print("total", sum(times))
-        except KeyboardInterrupt:
-                print("KeyboardInterrupt received, stopping motors...")
-        except Exception as e:
-                print(f"an error occurred: {e}")
-        finally:
-                mc.applyCurrentToMotor(1, 0)
-                mc.applyCurrentToMotor(2, 0)
-                print("motors stopped!")
+pc1 = PDController(0.000016,0.000);
+pc2 = PDController(0.000016,0.000);
+def loop():
+    def step():
+        angle1 = mc.readPosition(1)
+        angle2 = mc.readPosition(2)
+        tau1 = pc1.compute(angle2,angle1, dt)
+        tau2 = pc1.compute(angle1,angle2, dt)
+        mc.applyTorqueToMotor(1,tau1)   
+        mc.applyTorqueToMotor(2,tau2)   
+    run_until(step, N=N, dt=dt)
+    
+    mc.applyCurrentToMotor(1, 0)
+    mc.applyCurrentToMotor(2, 0)
+    
+    
+try:
+    loop()
+except KeyboardInterrupt:
+    print("KeyboardInterrupt received, stopping motors...")
+except Exception as e:
+    print(f"an error occurred: {e}")
+finally:
+    mc.applyCurrentToMotor(1, 0)
+    mc.applyCurrentToMotor(2, 0)
+    print("motors stopped!")

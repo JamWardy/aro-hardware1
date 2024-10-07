@@ -1,5 +1,5 @@
 from motor_control.AROMotorControl import AROMotorControl
-
+import time
 motor_control = AROMotorControl()
 
 def run_try_catch(func, *args, **kwargs):
@@ -14,9 +14,25 @@ def run_try_catch(func, *args, **kwargs):
     except Exception as e:
         print(f"an error occurred: {e}")
     finally:
+        print("stopping motors...")
         motor_control.applyCurrentToMotor(1, 0)
         motor_control.applyCurrentToMotor(2, 0)
         print("motors stopped!")
+
+
+def run_until(func, N=int(30),dt = 2. / 1e3, *args, **kwargs):   
+        times  = []
+        t= time.perf_counter()    
+        wait = dt / 20.   
+        for i in range(N):
+                func(*args, **kwargs)
+                while(time.perf_counter()-t<dt):
+                        pass
+                        time.sleep(wait)
+                times+=[time.perf_counter()  - t  ]
+                t =time.perf_counter()                
+                
+        
 
 if __name__ == "__main__":
 

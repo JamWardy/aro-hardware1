@@ -203,30 +203,8 @@ class AROMotorControl():
     
     def applyTorqueToMotor(self, motorid=1, torque=0.18):
         torque = max(min(torque, 0.5), -0.5)
-        current = int(torque / 0.16 * 100)
-        start = time.time()
-        torque_bytes = current.to_bytes(2, "little", signed=True)
-        #print(f"{torque_bytes[0]} {torque_bytes[1]}")
-        wid1 = WRITEID + motorid
-        rid1 = READID + motorid
-        dataw = [0xA1,0x00,0x00,0x00,torque_bytes[0],torque_bytes[1],0x00,0x00]
-        msg = can.Message(arbitration_id=wid1, data=dataw, is_extended_id=False)
-        self.pcan.send_message(msg)
-        msg = self.pcan.read_input(arbitration_id=wid1)
-        try:
-            motor_temp = msg.data[1]
-            current = int.from_bytes(msg.data[2:4], "little")
-            speed = int.from_bytes(msg.data[4:6], "little")
-            angle = int.from_bytes(msg.data[6:8], "little", signed=True) % 360
-            self.current_command_last_msg = (motor_temp, current, speed, angle)
-        except:
-            print("no message in the buffer")
-            return self.current_command_last_msg
-        return motor_temp, current, speed, angle
-    
-    def applyCurrentToMotor(self, motorid=1, current=0.18):
-        current = max(min(current, 0.5/0.16), -0.5/0.16)
-        current = int(current * 100)
+        I = torque / 0.16
+        current = int(I/0.01)
         start = time.time()
         torque_bytes = current.to_bytes(2, "little", signed=True)
         #print(f"{torque_bytes[0]} {torque_bytes[1]}")

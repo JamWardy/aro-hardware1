@@ -5,7 +5,7 @@ The `AROMotorControl` class provides methods to interface with the motors.
 ## Public Methods
 
 ### `setZero()`
-Sets the zero position for the specified motor. 
+Sets the zero position for the specified motor.
 #### Parameters
 - `motor_id` (int): The ID of the motor (default: 1). Possible Values are 1 or 2.
 
@@ -19,7 +19,7 @@ Please note that after calling this method, the power supply needs to be turned 
 mc = AROMotorControl()
 mc.setZero(1)
 mc.setZero(2)
-input("press any key to continue") 
+input("press any key to continue")
 ```
 - when you see this message turn off your power supply, wait for at least 2 seconds, turn it back on again, wait for 2 seconds, remove the aligner, and press enter (or any other key).
 - you can verify if the process was succeeful by calling
@@ -57,12 +57,12 @@ while some_condition:
     if some_condition:
         break
 ```
-### `applyCurrentToMotor()`
-Applies a current to the specified motor.
+### `applyTorqueToMotor()`
+Applies a torque to the specified motor.
 
 #### Parameters
 - `motorid` (int): The ID of the motor (default: 1).
-- `current` (float): The current to be applied in Amps (default: 0.18).
+- `torque` (float): The torque to be applied in Nm (default: 0.018).
 
 #### Returns
 - `motor_temp` (int): The temperature of the motor.

@@ -7510,7 +7510,7 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5825d8bf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4971bb18">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7520,14 +7520,14 @@ a.anchor-link {
 <p>Concretely, we will play with the notion of Proportional control (discussed in next week's lecture) and use this to reproduce a <a href="https://en.wikipedia.org/wiki/Steer-by-wire">steer-by-wire</a> system.</p>
 <h2 id="Preliminaries">Preliminaries<a class="anchor-link" href="#Preliminaries">¶</a></h2><p>First, listen to Garry or Katy for the first few minutes of the lab while they provide some guidance on the platform.</p>
 <h2 id="Communicating-with-the-device">Communicating with the device<a class="anchor-link" href="#Communicating-with-the-device">¶</a></h2><p>The DICE machines are connected to the platform using a CAN device. This is hidden within a high-level API but you can have a look at the code if you are interested in seeing how all of this works.</p>
-<p>To work, open a python console, or edit a file and execute the code that follows. The CAN bus protocol does not work very with Jupyter notebooks unfortunately and keyboard interruptions won't work.</p>
-<p>The API is presented in <a href="https://github.com/ediadvancedrobotics/hardwarelab/blob/main/README.md">AROMotorControlAPI.md</a>. The only methods that we need are <code>readPosition</code> and <code>applyTorqueToMotor</code>.</p>
+<p>To work, open a python console, or edit a file and execute the code that follows. The CAN bus protocol does not work very well with Jupyter notebooks and keyboard interruptions won't work either.</p>
+<p>The API is presented in <a href="https://github.com/ediadvancedrobotics/hardwarelab/blob/main/AROMotorControlAPI.md">AROMotorControlAPI.md</a>. The only methods that we need are <code>readPosition</code> and <code>applyTorqueToMotor</code>.</p>
 <p>Each method has a <code>motorid</code> parameter, taking the value 1 or 2, which points to the motor that you wish to control.</p>
 <p>Therefore, to read the position (joint angle value) or a motor, simply call:</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b384412a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=074fdfae">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7557,7 +7557,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93b33fb1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1f927b79">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7572,7 +7572,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dee20aed">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e9fb5f6b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7602,7 +7602,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d827a0d5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a146aa6c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7612,7 +7612,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=73deee62">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5a05b5b4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7678,7 +7678,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bffc93b2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0bb8d07a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7694,7 +7694,7 @@ For this let's create the class <code>PController</code>, for Proportional contr
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=733886af">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d9a62556">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7735,7 +7735,7 @@ For this let's create the class <code>PController</code>, for Proportional contr
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0853baa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=29af8c83">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7745,7 +7745,7 @@ For this let's create the class <code>PController</code>, for Proportional contr
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a16fa940">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c9d9ea0d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7819,7 +7819,7 @@ For this let's create the class <code>PController</code>, for Proportional contr
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=613f60f8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2d59852d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7835,7 +7835,7 @@ A common issue you will encounter is overshooting, when you go beyond the desire
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7c4597f2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=614cfd64">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -31,8 +31,8 @@ def resandrun(torque):
         except Exception as e:
             print(f"an error occurred: {e}")
         finally:
-            mc.applyCurrentToMotor(1, 0)
-            mc.applyCurrentToMotor(2, 0)
+            mc.applyTorqueToMotor(1, 0)
+            mc.applyTorqueToMotor(2, 0)
             print("motors stopped!")
 
         time_values = [i * dt for i in range(len(anglevalues))]
@@ -47,11 +47,10 @@ def resandrun(torque):
         
         
 def clip(output):
-    #return output
     outabs = abs(output)
     if outabs < 1e-4:
         return 0
-    clipped = max(min(outabs, 0.1), 0.02)
+    clipped = max(min(outabs, 0.5), 0.02)
     return clipped if output > 0 else -clipped
 
 class PController:
@@ -87,8 +86,8 @@ def goTo(controller, target, time = 1., dt = 0.005, motorid =1):
         
     run_until(oneStep, N=N, dt=dt)
     
-    mc.applyCurrentToMotor(1, 0)
-    mc.applyCurrentToMotor(2, 0)
+    mc.applyTorqueToMotor(1, 0)
+    mc.applyTorqueToMotor(2, 0)
     
     time_values = [i * dt for i in range(len(anglevalues))]
     # Plotting the angle values
@@ -108,11 +107,11 @@ class PDController:
         self.Kp = Kp
         self.Kd = Kd
         self.prev_error = 0
-        self.first_call = True #do not compute error variation on first call
+        self.elapsed = 0.
         
     
     def reset(self):
-        self.first_call = True
+        self.elapsed = 0.
                       
     def shortest_path_error(self, target, current):
         diff = ( target - current + 180 ) % 360 - 180;
@@ -125,10 +124,14 @@ class PDController:
         
     def compute(self, target, current, dt):
         error = self.shortest_path_error(target, current)        
-        d_error = (error - self.prev_error) if not self.first_call else 0
+        d_error = (error - self.prev_error) if self.elapsed >= dt else 0
         output = self.Kp*error + self.Kd * d_error
-        self.first_call = False
-        return clip(output)
+        if (self.elapsed < 2*dt):
+                output = clip(output)
+        else:
+                output = clip(output)
+        self.elapsed += dt
+        return output
         
     
 def goTo(controller, target, time = 1., dt = 0.005, motorid =1):
@@ -141,11 +144,11 @@ def goTo(controller, target, time = 1., dt = 0.005, motorid =1):
         anglevalues+=[currentAngle]
         tau = controller.compute(target,currentAngle, dt)
         mc.applyTorqueToMotor(motorid,tau)   
-        
+    controller.reset()
     run_until(oneStep, N=N, dt=dt)
     
-    mc.applyCurrentToMotor(1, 0)
-    mc.applyCurrentToMotor(2, 0)
+    mc.applyTorqueToMotor(1, 0)
+    mc.applyTorqueToMotor(2, 0)
     
     
     time_values = [i * dt for i in range(len(anglevalues))]
@@ -174,8 +177,8 @@ def loop():
         mc.applyTorqueToMotor(2,tau2)   
     run_until(step, N=N, dt=dt)
     
-    mc.applyCurrentToMotor(1, 0)
-    mc.applyCurrentToMotor(2, 0)
+    mc.applyTorqueToMotor(1, 0)
+    mc.applyTorqueToMotor(2, 0)
     
     
 try:
@@ -185,6 +188,6 @@ except KeyboardInterrupt:
 except Exception as e:
     print(f"an error occurred: {e}")
 finally:
-    mc.applyCurrentToMotor(1, 0)
-    mc.applyCurrentToMotor(2, 0)
+    mc.applyTorqueToMotor(1, 0)
+    mc.applyTorqueToMotor(2, 0)
     print("motors stopped!")
